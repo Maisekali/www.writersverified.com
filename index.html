@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WriteHub - Online Writing Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#1e40af',
+                        accent: '#f59e0b',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background: linear-gradient(to right, #3b82f6, #1e40af);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3);
+        }
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .progress-bar {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #3b82f6, #1e40af);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-pen-fancy text-primary text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-dark">WriteHub</span>
+                    </div>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="scrollToSection('features')" class="text-gray-600 hover:text-primary font-medium">Features</button>
+                    <button onclick="scrollToSection('how-it-works')" class="text-gray-600 hover:text-primary font-medium">How It Works</button>
+                    <button onclick="scrollToSection('testimonials')" class="text-gray-600 hover:text-primary font-medium">Testimonials</button>
+                    <button onclick="openPaymentModal()" class="btn-primary text-white px-4 py-2 rounded-lg font-medium">Join Now</button>
+                </div>
+                <div class="md:hidden flex items-center">
+                    <button class="text-gray-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="py-16 md:py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-10 md:mb-0">
+                    <h1 class="text-4xl md:text-5xl font-bold text-dark leading-tight mb-4">
+                        Unlock Your Writing Potential
+                    </h1>
+                    <p class="text-xl text-gray-600 mb-8">
+                        Join our exclusive writing platform where freelancers earn while honing their craft. 
+                        Pay a one-time fee to access premium writing opportunities.
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                        <button onclick="openPaymentModal()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold text-lg">
+                            <i class="fas fa-lock mr-2"></i> Join Now - KSh 499
+                        </button>
+                        <button onclick="scrollToSection('how-it-works')" class="border-2 border-primary text-primary px-8 py-3 rounded-lg font-semibold text-lg hover:bg-primary hover:text-white transition duration-300">
+                            Learn More
+                        </button>
+                    </div>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="relative">
+                        <div class="w-64 h-64 md:w-80 md:h-80 bg-primary rounded-full opacity-10 absolute -top-6 -left-6"></div>
+                        <div class="w-64 h-64 md:w-80 md:h-80 bg-accent rounded-full opacity-10 absolute -bottom-6 -right-6"></div>
+                        <div class="relative bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+                            <div class="flex items-center mb-4">
+                                <div class="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+                                <div class="ml-4">
+                                    <div class="h-4 bg-gray-300 rounded w-24 mb-2"></div>
+                                    <div class="h-3 bg-gray-200 rounded w-16"></div>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="h-3 bg-gray-300 rounded w-full"></div>
+                                <div class="h-3 bg-gray-300 rounded w-5/6"></div>
+                                <div class="h-3 bg-gray-300 rounded w-4/6"></div>
+                            </div>
+                            <div class="mt-6 flex justify-between items-center">
+                                <span class="text-sm text-gray-500">Freelancer</span>
+                                <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium">
+                                    Start Writing
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-16 bg-light">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-dark mb-4">Why Choose WriteHub?</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Our platform offers unique opportunities for skilled writers to showcase their talents
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-money-bill-wave text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Premium Opportunities</h3>
+                    <p class="text-gray-600">Access to high-paying writing projects that only our members can see.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Skill Development</h3>
+                    <p class="text-gray-600">Enhance your writing skills with mentorship and feedback from experts.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Community Support</h3>
+                    <p class="text-gray-600">Connect with fellow writers and build professional relationships.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-shield-alt text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Secure Platform</h3>
+                    <p class="text-gray-600">Trustworthy environment with secure payment and project management.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="w-12 h-12 bg-accent rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-bolt text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Fast Payment Processing</h3>
+                    <p class="text-gray-600">Receive payments quickly through our integrated Safaricom M-Pesa system.</p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                    <div class="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Performance Tracking</h3>
+                    <p class="text-gray-600">Monitor your progress and performance with detailed analytics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-dark mb-4">How It Works</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Getting started is simple and straightforward
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white font-bold text-xl">1</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Join Our Platform</h3>
+                    <p class="text-gray-600">Pay the KSh 499 entry fee through our secure M-Pesa system.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white font-bold text-xl">2</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Get Verified</h3>
+                    <p class="text-gray-600">Complete your profile and verify your writing skills.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white font-bold text-xl">3</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Start Writing</h3>
+                    <p class="text-gray-600">Access premium writing opportunities and start earning.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white font-bold text-xl">4</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-dark mb-2">Grow Your Career</h3>
+                    <p class="text-gray-600">Build your reputation and increase your earning potential.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="py-16 bg-light">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-dark mb-4">Success Stories</h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Hear from our successful freelancers
+                </p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full"></div>
+                        <div class="ml-4">
+                            <h4 class="font-semibold text-dark">Sarah Mwangi</h4>
+                            <p class="text-gray-600 text-sm">Freelance Writer</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "Joining WriteHub was a game-changer for my career. The entry fee was worth every shilling. I've earned over KSh 50,000 in just three months!"
+                    </p>
+                    <div class="flex mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full"></div>
+                        <div class="ml-4">
+                            <h4 class="font-semibold text-dark">James Kimani</h4>
+                            <p class="text-gray-600 text-sm">Content Specialist</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "The quality of projects I've received is exceptional. The platform's structure ensures I get paid promptly through M-Pesa. Highly recommended!"
+                    </p>
+                    <div class="flex mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star-half-alt"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gray-300 rounded-full"></div>
+                        <div class="ml-4">
+                            <h4 class="font-semibold text-dark">Emily Omondi</h4>
+                            <p class="text-gray-600 text-sm">Copywriter</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "The community aspect and mentorship opportunities have significantly improved my writing skills. The 499 entry fee was a small investment for the returns."
+                    </p>
+                    <div class="flex mt-4 text-yellow-400">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-gradient-to-r from-primary to-secondary">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Transform Your Writing Career?</h2>
+            <p class="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+                Join thousands of successful freelancers who have already joined our platform. Pay KSh 499 now to start your journey.
+            </p>
+            <button onclick="openPaymentModal()" class="btn-primary text-white px-8 py-4 rounded-lg font-bold text-lg">
+                <i class="fas fa-lock mr-2"></i> Join WriteHub Today - KSh 499
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i class="fas fa-pen-fancy text-accent text-2xl mr-2"></i>
+                        <span class="text-xl font-bold">WriteHub</span>
+                    </div>
+                    <p class="text-gray-400">
+                        Empowering writers with premium opportunities and professional growth.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><button onclick="scrollToSection('features')" class="text-gray-400 hover:text-white">Features</button></li>
+                        <li><button onclick="scrollToSection('how-it-works')" class="text-gray-400 hover:text-white">How It Works</button></li>
+                        <li><button onclick="scrollToSection('testimonials')" class="text-gray-400 hover:text-white">Testimonials</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Support</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact Info</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2"></i> contact@writehub.co.ke
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2"></i> +254 700 000 000
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 WriteHub. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="payment-modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-dark">Complete Your Registration</h3>
+                <button onclick="closePaymentModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                <p class="text-blue-800 font-medium">
+                    <i class="fas fa-info-circle mr-2"></i> 
+                    Pay KSh 499 through M-Pesa to access exclusive writing opportunities
+                </p>
+            </div>
+
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="font-semibold text-dark">Payment Amount</span>
+                    <span class="text-xl font-bold text-primary">KSh 499</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="text-sm text-gray-500 mt-2">Payment progress: <span id="progressText">0%</span></div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-2">Enter M-Pesa Phone Number</label>
+                <input type="tel" id="mpesaNumber" placeholder="e.g. 0712345678" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-2">Your Full Name</label>
+                <input type="text" id="fullName" placeholder="Enter your full name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                <h4 class="font-semibold text-dark mb-2">Payment Instructions</h4>
+                <ul class="list-disc list-inside text-gray-600 space-y-1">
+                    <li>Enter your M-Pesa phone number correctly</li>
+                    <li>Click "Send Payment" to initiate the transaction</li>
+                    <li>You will receive a confirmation SMS from M-Pesa</li>
+                    <li>After confirmation, you'll gain access to the platform</li>
+                </ul>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <button onclick="closePaymentModal()" class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                    Cancel
+                </button>
+                <button onclick="initiatePayment()" class="btn-primary text-white px-8 py-3 rounded-lg font-semibold">
+                    <i class="fas fa-mobile-alt mr-2"></i> Send Payment
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function scrollToSection(sectionId) {
+            const element = document.getElementById(sectionId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function openPaymentModal() {
+            document.getElementById('paymentModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function initiatePayment() {
+            const mpesaNumber = document.getElementById('mpesaNumber').value;
+            const fullName = document.getElementById('fullName').value;
+
+            if (!mpesaNumber || !fullName) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            // Simulate payment processing
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressFill.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        alert('Payment initiated successfully! You will receive a confirmation SMS shortly.');
+                        closePaymentModal();
+                        // Reset form
+                        document.getElementById('mpesaNumber').value = '';
+                        document.getElementById('fullName').value = '';
+                        progressFill.style.width = '0%';
+                        progressText.textContent = '0%';
+                    }, 500);
+                }
+            }, 100);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('paymentModal');
+            if (event.target === modal) {
+                closePaymentModal();
+            }
+        }
+
+        // Initialize with a small animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200 * index);
+            });
+        });
+    </script>
+</body>
+</html>
